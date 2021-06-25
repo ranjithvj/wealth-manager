@@ -1,0 +1,131 @@
+﻿@using WealthManager.Client.Services.Implementations
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+
+<Layout Style="min-height: 100vh; ">
+    <div class="logo" />
+    <Sider Collapsible Collapsed=@collapsed OnCollapse=@onCollapse>
+        <div class="logo" />
+        <Menu Theme="MenuTheme.Dark" DefaultSelectedKeys=@(new[]{"1"}) Mode="MenuMode.Inline">
+            <MenuItem Key="1">
+                <Icon Type="pie-chart" Theme="outline" />
+                <span>Option 1</span>
+            </MenuItem>
+            <MenuItem Key="2">
+                <Icon Type="desktop" Theme="outline" />
+                <span>Option 2</span>
+            </MenuItem>
+            @{
+                RenderFragment sub1Title =
+                @<span>
+                    <Icon Type="user" Theme="outline" />
+                    <span>User</span>
+                </span>;
+            }
+            <SubMenu Key="sub1" TitleTemplate=sub1Title>
+                <MenuItem Key="3">Tom</MenuItem>
+                <MenuItem Key="4">Bill</MenuItem>
+                <MenuItem Key="5">Alex</MenuItem>
+            </SubMenu>
+            @{
+                RenderFragment sub2Title =
+                @<span>
+                    <Icon Type="team" Theme="outline" />
+                    <span>Team</span>
+                </span>;
+            }
+            <SubMenu Key="sub2" TitleTemplate=sub2Title>
+                <MenuItem Key="6">Team 1</MenuItem>
+                <MenuItem Key="8">Team 2</MenuItem>
+            </SubMenu>
+
+
+            <MenuItem Key="9" @onclick="@LogoutClick">
+                <Icon Type="logout" Theme="outline" />
+                <span>Logout</span>
+            </MenuItem>
+        </Menu>
+    </Sider>
+    @*<Layout Class="site-layout">
+            <Header Class="site-layout-background" Style=" padding: 0 ;"></Header>
+            <Content Style="margin:0 16px;">
+                <Breadcrumb Style="margin:16px 0;">
+                    <BreadcrumbItem>User</BreadcrumbItem>
+                    <BreadcrumbItem>Bill</BreadcrumbItem>
+                </Breadcrumb>
+                <div class="site-layout-background" style="padding: 24; min-height: 360px">
+                    Bill is a cat.
+                </div>
+            </Content>
+            <Footer Style="text-align:center ">Ant Design ©2018 Created by Ant UED</Footer>
+        </Layout>*@
+</Layout>
+
+@code {
+    bool collapsed;
+
+    void onCollapse(bool collapsed)
+    {
+        Console.WriteLine(collapsed);
+        this.collapsed = collapsed;
+    }
+
+    async Task LogoutClick()
+    {
+        await authStateProvider.Logout();
+        navigationManager.NavigateTo("/login");
+    }
+}
+
+
+<style>
+    #components-layout-demo-side .logo {
+        height: 32px;
+        background: rgba(255, 255, 255, 0.2);
+        margin: 16px;
+    }
+
+    .site-layout .site-layout-background {
+        background: #fff;
+    }
+</style>
+
+
+
+@*<div class="top-row pl-4 navbar navbar-dark">
+        <a class="navbar-brand" href="">WealthManager</a>
+        <button class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+        <ul class="nav flex-column">
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="counter">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="fetchdata">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                </NavLink>
+            </li>
+        </ul>
+    </div>
+
+    @code {
+        private bool collapseNavMenu = true;
+
+        private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+        private void ToggleNavMenu()
+        {
+            collapseNavMenu = !collapseNavMenu;
+        }
+    }*@

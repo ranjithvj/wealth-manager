@@ -1,0 +1,98 @@
+﻿@page "/register"
+@using WealthManager.Client.Services.Implementations
+@using WealthManager.Shared.ViewModels
+@layout LoginLayout
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+
+
+
+<div class="centeredCard">
+    <Card Style="width:350px;">
+        <TitleTemplate>
+            <Icon Type="codepen" Theme="outline" /> Register
+        </TitleTemplate>
+        <Body>
+            <Form Model="@registerParameters"
+                  OnFinish="@OnSubmit"
+                  OnFinishFailed="OnFinishFailed"
+                  LabelColSpan="12"
+                  WrapperColSpan="12">
+                <FormItem Label="First Name">
+                    <Input @bind-Value="@registerParameters.Name"/>
+                </FormItem>
+                <FormItem Label="Username">
+                    <Input @bind-Value="@registerParameters.UserName" />
+                </FormItem>
+                <FormItem Label="Password">
+                    <InputPassword @bind-Value="@registerParameters.Password" />
+                </FormItem>
+                <FormItem Label="Confirm Password">
+                    <InputPassword @bind-Value="@registerParameters.PasswordConfirm" />
+                </FormItem>
+                <FormItem WrapperColOffset="0" WrapperColSpan="24">
+                    <Button Type="@ButtonType.Primary" HtmlType="submit">
+                        Submit
+                    </Button>
+                </FormItem>
+                <label class="text-danger">@error</label>
+            </Form>
+            <NavLink href="login">
+                <span class="font-weight-normal text-center">Login</span>
+            </NavLink>
+        </Body>
+    </Card>
+</div>
+
+@*<EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
+    <DataAnnotationsValidator />
+    <h4 class="font-weight-normal text-center">Create Account</h4>
+
+    <label for="inputUsername" class="sr-only">User Name</label>
+    <InputText id="inputUsername" class="form-control" placeholder="Username" autofocus @bind-Value="@registerParameters.UserName" />
+    <ValidationMessage For="@(() => registerParameters.UserName)" />
+
+    <label for="inputPassword" class="sr-only">Password</label>
+    <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="@registerParameters.Password" />
+    <ValidationMessage For="@(() => registerParameters.Password)" />
+
+    <label for="inputName" class="sr-only">Name</label>
+    <InputText id="inputname" class="form-control" placeholder="Name" autofocus @bind-Value="@registerParameters.Name" />
+    <ValidationMessage For="@(() => registerParameters.Name)" />
+
+    <label for="inputPasswordConfirm" class="sr-only">Password Confirmation</label>
+    <InputText type="password" id="inputPasswordConfirm" class="form-control" placeholder="Password Confirmation" @bind-Value="@registerParameters.PasswordConfirm" />
+    <ValidationMessage For="@(() => registerParameters.PasswordConfirm)" />
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+
+    <label class="text-danger">@error</label>
+    <NavLink href="login">
+        <h6 class="font-weight-normal text-center">Already have an account? Click here to login</h6>
+    </NavLink>
+</EditForm>*@
+
+@functions{ UserRegisterVM registerParameters { get; set; } = new UserRegisterVM();
+    string error { get; set; }
+
+    async Task OnSubmit()
+    {
+        error = null;
+        try
+        {
+            await authStateProvider.Register(registerParameters);
+            navigationManager.NavigateTo("login");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed");
+    }
+
+    }
+

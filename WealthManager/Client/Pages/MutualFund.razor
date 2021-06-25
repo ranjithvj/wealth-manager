@@ -1,0 +1,319 @@
+﻿@page "/mutualfund"
+@inject MutualFundAPIClient _mfApi
+@using WealthManager.Shared.ViewModels
+@using System.ComponentModel
+@using AntDesign.TableModels
+@using System.ComponentModel.DataAnnotations
+@using WealthManager.Client.Helpers
+@using WealthManager.Shared.Helpers
+@using System.Globalization;
+@using System.Net.Http;
+
+<Row Gutter="16">
+    <AntDesign.Col Span="12">
+        <h4>Mutual Funds</h4>
+    </AntDesign.Col>
+</Row>
+
+@if (!string.IsNullOrEmpty(loadingError))
+{
+    <label class="text-danger">@loadingError</label>
+}
+
+<Skeleton Active="true" Loading="@_loading"></Skeleton>
+@if (!_loading)
+{
+    <Row Gutter="16">
+        <AntDesign.Col Span="4" Offset="20">
+            <Button Type="primary" @onclick="Create" Icon="upload"> Upload CAS </Button>
+        </AntDesign.Col>
+    </Row>
+    <br />
+
+    <Table TItem="MutualFundVM" DataSource="@mutualFunds" Size=@TableSize.Middle PageSize="5">
+
+        <Column @bind-Field="@context.Name"></Column>
+        <Column @bind-Field="@context.UnitsHeld"></Column>
+        <Column @bind-Field="@context.InvestedAmountRef"></Column>
+        <Column @bind-Field="@context.CurrentValueRef"></Column>
+        <Column @bind-Field="@context.UnrealizedGainRef"></Column>
+        <Column @bind-Field="@context.XIRRRef"></Column>
+        <ActionColumn Title="Actions">
+            <Space>
+                <SpaceItem><Button Type="primary" OnClick="() => View(context.Id)" Icon="eye"></Button></SpaceItem>
+            </Space>
+        </ActionColumn>
+    </Table>
+}
+
+<div>
+    <Modal Title="@modalTitle"
+           Visible="@isAdd"
+           OnCancel="@CloseModal"
+           Style="top: 10px; height : 30vh; width : 30vmax"
+           Footer=@null>
+
+        <Form Model="@fileUpload"
+              OnFinish="@UploadCAS"
+              OnFinishFailed="OnFinishFailed"
+              LabelColSpan="8"
+              WrapperColSpan="16">
+            <FormItem Label="CAS File">
+                <InputFile OnChange="@OnInputFileChange" multiple />
+            </FormItem>
+            <FormItem Label="Password">
+                <InputPassword @bind-Value="@fileUpload.password" />
+            </FormItem>
+            <FormItem WrapperColOffset="12" WrapperColSpan="8">
+                <Button Type="@ButtonType.Primary" HtmlType="submit">
+                    Upload
+                </Button>
+            </FormItem>
+            <label class="text-danger">@error</label>
+        </Form>
+    </Modal>
+</div>
+
+<div>
+    <Modal Title="@modalTitle"
+           Visible="@isView"
+           OnCancel="@CloseModal"
+           Style="top: 10px; height : 90vh; width : 40vmax"
+           Footer=@null>
+
+        <Template style="height:90%">
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        Name
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.Name
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        Units Held
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.UnitsHeld
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        Invested Amount
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.InvestedAmountRef
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        Current Value
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.CurrentValueRef
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        Unrealized Gain
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.UnrealizedGainRef
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        XIRR
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.XIRRRef
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        Avg. Buying NAV
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.AvgBuyingNavRef
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        Current Nav
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.CurrentNavRef
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+
+            <Row Gutter="16">
+                <AntDesign.Col Span="10">
+                    <Text>
+                        CAS Uploaded on
+                    </Text>
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Text>
+                        @mutualFund.LastUpdatedOnIST
+                    </Text>
+                </AntDesign.Col>
+            </Row>
+        </Template>
+
+    </Modal>
+</div>
+
+@code {
+
+    public class FileUpload
+    {
+        [Required]
+        [DataType(DataType.Password)]
+        public string password { get; set; }
+
+        public MultipartFormDataContent content = null;
+
+        public void AddPasswordToForm()
+        {
+            this.content.Add(new StringContent(this.password), "password");
+        }
+    }
+
+    protected FileUpload fileUpload = new FileUpload();
+    protected List<MutualFundVM> mutualFunds { get; set; }
+    protected MutualFundVM mutualFund = new MutualFundVM();
+    protected int selectedMutualFundId { get; set; }
+    protected string modalTitle { get; set; }
+    protected bool isAdd { get; set; }
+    protected bool isView { get; set; }
+    protected string error { get; set; }
+    protected string loadingError { get; set; }
+    protected bool _loading = true;
+    private int maxAllowedFiles = 1;
+
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            loadingError = null;
+            await base.OnParametersSetAsync();
+            mutualFunds = await _mfApi.GetAllMutualFunds();
+            _loading = false;
+        }
+        catch (Exception e)
+        {
+            loadingError = e.Message;
+        }
+    }
+
+    protected void Create()
+    {
+        this.isAdd = true;
+        this.modalTitle = "Upload Latest CAS";
+    }
+
+
+    protected async Task View(int id)
+    {
+        mutualFund = await _mfApi.GetMutualFundById(id);
+        selectedMutualFundId = id;
+        this.isView = true;
+        this.modalTitle = "View Mutual Fund";
+    }
+
+    protected void CloseModal()
+    {
+        this.fileUpload = new FileUpload();
+        this.mutualFund = new MutualFundVM();
+        this.selectedMutualFundId = 0;
+        this.isAdd = false;
+        this.isView = false;
+        this.error = null;
+        StateHasChanged();
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed");
+    }
+
+    private async Task UploadCAS()
+    {
+        try
+        {
+            this.error = null;
+            this.fileUpload.AddPasswordToForm();
+            await _mfApi.ProcessCAS(this.fileUpload.content);
+
+            CloseModal();
+            await OnParametersSetAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        this.error = null;
+        long maxFileSize = 1024 * 1024 * 15;
+
+        this.fileUpload.content = new MultipartFormDataContent();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            var fileContent = new StreamContent(file.OpenReadStream());
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+
+            if (file.Size < maxFileSize)
+            {
+                this.fileUpload.content.Add(
+                    content: fileContent,
+                    name: "\"files\"",
+                    fileName: file.Name
+                );
+            }
+            else
+            {
+                error = "File size too big";
+                break;
+            }
+        }
+    }
+}

@@ -1,0 +1,406 @@
+﻿@page "/fixeddeposit"
+@inject FixedDepositAPIClient _fdApi
+@using WealthManager.Shared.ViewModels
+@using System.ComponentModel
+@using AntDesign.TableModels
+@using System.ComponentModel.DataAnnotations
+@using WealthManager.Client.Helpers
+@using WealthManager.Shared.Helpers
+@using System.Globalization;
+
+<Row Gutter="16">
+    <AntDesign.Col Span="12">
+        <h4>Fixed Deposits</h4>
+    </AntDesign.Col>
+</Row>
+
+<Row Gutter="16">
+    <AntDesign.Col Span="4" Offset="20">
+        <Button Type="primary" @onclick="Create" Icon="plus-circle"> Add New </Button>
+    </AntDesign.Col>
+</Row>
+<br />
+<Skeleton Active="true" Loading="@_loading"></Skeleton>
+
+@if (!_loading)
+{
+
+    <Table TItem="FixedDepositVM" DataSource="@fixedDeposits" Size=@TableSize.Middle PageSize="5">
+
+        <Column @bind-Field="@context.BankName"></Column>
+        <Column @bind-Field="@context.PrincipalRef"></Column>
+        <Column @bind-Field="@context.RateOfInterestRef"></Column>
+        <Column @bind-Field="@context.MaturityAmountRef"></Column>
+        <Column @bind-Field="@context.MaturityDate" Format="dd/MM/yyyy"></Column>
+        <ActionColumn Title="Actions">
+            <Space>
+                <SpaceItem><Button Type="primary" OnClick="() => View(context.Id)" Icon="eye"></Button></SpaceItem>
+                <SpaceItem><Button Type="primary" OnClick="() => Edit(context.Id)" Icon="edit"></Button></SpaceItem>
+                <SpaceItem><Button Type="primary" OnClick="() => Delete(context.Id)" Icon="delete" Danger></Button></SpaceItem>
+            </Space>
+        </ActionColumn>
+    </Table>
+}
+
+<div>
+    <Modal Title="@modalTitle"
+           Visible="@isAdd"
+           OnCancel="@CloseModal"
+           Style="top: 10px; height : 90vh; width : 40vmax"
+           Footer=@null>
+
+        <Form Model="@fixedDeposit"
+              OnFinish="@CreateFD"
+              OnFinishFailed="OnFinishFailed"
+              Layout="Vertical">
+
+            <Template style="height:90%">
+                <Row Gutter="16">
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="Bank">
+                            <Select Mode="default"
+                                    DataSource="@banks"
+                                    @bind-Value="@context.BankId"
+                                    LabelName="@nameof(bank.Name)"
+                                    ValueName="@nameof(bank.Id)"
+                                    Placeholder="Choose a Bank"
+                                    required>
+                            </Select>
+                        </FormItem>
+                    </AntDesign.Col>
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="Type">
+                            <Select Mode="default"
+                                    DataSource="@fdTypes"
+                                    @bind-Value="@context.FixedDepositTypeId"
+                                    LabelName="@nameof(fdType.Name)"
+                                    ValueName="@nameof(fdType.Id)"
+                                    >
+                            </Select>
+                        </FormItem>
+                    </AntDesign.Col>
+                </Row>
+                <Row Gutter="16">
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="Start Date">
+                            <DatePicker @bind-Value="@context.StartDate" Format="dd/MM/yyyy" AllowClear="false" />
+                        </FormItem>
+                    </AntDesign.Col>
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="Maturity Date">
+                            <DatePicker @bind-Value="@context.MaturityDate" Format="dd/MM/yyyy" AllowClear="false" />
+                        </FormItem>
+                    </AntDesign.Col>
+                </Row>
+                <Row Gutter="16">
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="Principal">
+                            <AntDesign.InputNumber @bind-Value="@context.Principal" Formatter="DataTypeFormatter.FormatDecimalToCurrencyString"
+                                                   Parser="DataTypeFormatter.ParseCurrencyStringToValue" />
+                        </FormItem>
+                    </AntDesign.Col>
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="Maturity Amount">
+                            <AntDesign.InputNumber @bind-Value="@context.MaturityAmount" Formatter="DataTypeFormatter.FormatDecimalToCurrencyString"
+                                                   Parser="DataTypeFormatter.ParseCurrencyStringToValue" />
+                        </FormItem>
+                    </AntDesign.Col>
+                </Row>
+                <Row Gutter="16">
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="No. of Installments">
+                            <AntDesign.InputNumber @bind-Value="@context.Duration_Months" />
+                        </FormItem>
+                    </AntDesign.Col>
+                    <AntDesign.Col Span="12">
+                        <FormItem Label="Rate Of Interest">
+                            <AntDesign.InputNumber @bind-Value="@context.RateOfInterest" Formatter="DataTypeFormatter.FormatDecimalToPercentageString"
+                                                   Parser="DataTypeFormatter.ParsePercentageStringToValue" />
+                        </FormItem>
+                    </AntDesign.Col>
+                </Row>
+                <Row>
+                    <AntDesign.Col Span="12">
+
+                    </AntDesign.Col>
+                    <AntDesign.Col Span="12">
+                        <Button Type="@ButtonType.Primary" @onclick="CloseModal">
+                            Cancel
+                        </Button>
+                        <Button Type="@ButtonType.Primary" HtmlType="submit">
+                            Submit
+                        </Button>
+                    </AntDesign.Col>
+                </Row>
+                <Row>
+                    <AntDesign.Col Span="24">
+                        <label class="text-danger">@error</label>
+                    </AntDesign.Col>
+                </Row>
+            </Template>
+        </Form>
+    </Modal>
+</div>
+
+<div>
+    <Modal Title="@modalTitle"
+           Visible="@isView"
+           OnCancel="@CloseModal"
+           Style="top: 10px; height : 90vh; width : 40vmax"
+           Footer=@null>
+
+        @if (isDelete)
+        {
+            <h4>
+                <Text Type="danger">Are you sure you want to delete ?</Text>
+            </h4>
+            <br />
+        }
+    <Template style="height:90%">
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    Bank
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.BankName
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    Principal
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.PrincipalRef
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    Start Date
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.StartDate.ToShortDateString()
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    Maturity Date
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.MaturityDate.ToShortDateString()
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    Maturity Amount
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.MaturityAmountRef
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    Rate Of Interest
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.RateOfInterestRef
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    No. of installments
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.Duration_Months
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <Row Gutter="16">
+            <AntDesign.Col Span="10">
+                <Text>
+                    Updated On
+                </Text>
+            </AntDesign.Col>
+            <AntDesign.Col Span="12">
+                <Text>
+                    @fixedDeposit.LastUpdatedOnIST
+                </Text>
+            </AntDesign.Col>
+        </Row>
+        <br />
+
+        @if (isDelete)
+        {
+            <Row>
+                <AntDesign.Col Span="12">
+
+                </AntDesign.Col>
+                <AntDesign.Col Span="12">
+                    <Button Type="@ButtonType.Primary" @onclick="CloseModal">
+                        Cancel
+                    </Button>
+                    <Button Type="@ButtonType.Primary" Danger @onclick="DeleteFD">
+                        Delete
+                    </Button>
+                </AntDesign.Col>
+            </Row>
+            <Row>
+                <AntDesign.Col Span="24">
+                    <label class="text-danger">@error</label>
+                </AntDesign.Col>
+            </Row>
+        }
+    </Template>
+
+    </Modal>
+</div>
+
+@code {
+
+    protected List<FixedDepositVM> fixedDeposits { get; set; }
+    protected FixedDepositVM fixedDeposit = new FixedDepositVM
+    {
+        StartDate = DateTime.Today,
+        MaturityDate = DateTime.Today.AddYears(1)
+    };
+    protected int selectedFixedDepositId { get; set; }
+    protected string modalTitle { get; set; }
+    protected bool isAdd { get; set; }
+    protected bool isView { get; set; }
+    protected bool isDelete { get; set; }
+    protected List<BankVM> banks { get; set; }
+    protected BankVM bank = new BankVM();
+    protected List<FixedDepositTypeVM> fdTypes { get; set; }
+    protected FixedDepositTypeVM fdType = new FixedDepositTypeVM();
+    protected string error { get; set; }
+    protected bool _loading = true;
+
+    protected async override Task OnInitializedAsync()
+    {
+        banks = await _fdApi.GetAllBanks();
+        fdTypes = await _fdApi.GetAllFixedDepositTypes();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        fixedDeposits = await _fdApi.GetAllFixedDeposits();
+        _loading = false;
+    }
+
+    protected void Create()
+    {
+        this.isAdd = true;
+        this.modalTitle = "Add Fixed Deposit";
+    }
+
+    protected async Task Edit(int id)
+    {
+        fixedDeposit = await _fdApi.GetFixedDepositById(id);
+        selectedFixedDepositId = id;
+        this.isAdd = true;
+        this.modalTitle = "Edit Fixed Deposit";
+    }
+
+    protected async Task View(int id)
+    {
+        fixedDeposit = await _fdApi.GetFixedDepositById(id);
+        selectedFixedDepositId = id;
+        this.isView = true;
+        this.modalTitle = "View Fixed Deposit";
+    }
+
+    protected async Task Delete(int id)
+    {
+        fixedDeposit = await _fdApi.GetFixedDepositById(id);
+        selectedFixedDepositId = id;
+        this.isView = true;
+        this.isDelete = true;
+        this.modalTitle = "Delete Fixed Deposit";
+    }
+
+    protected async Task CreateFD()
+    {
+        error = null;
+        try
+        {
+            if (selectedFixedDepositId == 0)
+            {
+                await _fdApi.CreateFixedDeposit(fixedDeposit);
+            }
+            else
+            {
+                await _fdApi.UpdateFixedDeposit(fixedDeposit);
+            }
+
+            CloseModal();
+            await OnParametersSetAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+
+    protected async Task DeleteFD()
+    {
+        error = null;
+        try
+        {
+            await _fdApi.DeleteFixedDeposit(selectedFixedDepositId);
+            CloseModal();
+            await OnParametersSetAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+
+    protected void CloseModal()
+    {
+        fixedDeposit = new FixedDepositVM
+        {
+            StartDate = DateTime.Today,
+            MaturityDate = DateTime.Today.AddYears(1)
+        };
+        selectedFixedDepositId = 0;
+        bank = new BankVM();
+        fdType = new FixedDepositTypeVM();
+        this.isAdd = false;
+        this.isView = false;
+        this.isDelete = false;
+        StateHasChanged();
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed");
+    }
+}

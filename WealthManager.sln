@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XIRRCalculator", "XIRRCalculator\XIRRCalculator.csproj", "{C3E86C66-8989-4D7F-8CAF-65B9B7415FAF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WealthManager.Server", "WealthManager\Server\WealthManager.Server.csproj", "{68157458-2A60-4CE0-A4D3-7A478A6F2AAB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WealthManager.Client", "WealthManager\Client\WealthManager.Client.csproj", "{AB22E511-F32B-4E87-A4FE-356B398F12F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WealthManager.Shared", "WealthManager\Shared\WealthManager.Shared.csproj", "{DAAA1143-385F-42A7-A4F4-A139CA78ACAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WealthManager.Unittest", "WealthManager.Unittest\WealthManager.Unittest.csproj", "{D3B56FD8-843B-4D00-8C6C-3C8429386809}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3E86C66-8989-4D7F-8CAF-65B9B7415FAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E86C66-8989-4D7F-8CAF-65B9B7415FAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E86C66-8989-4D7F-8CAF-65B9B7415FAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E86C66-8989-4D7F-8CAF-65B9B7415FAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68157458-2A60-4CE0-A4D3-7A478A6F2AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68157458-2A60-4CE0-A4D3-7A478A6F2AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68157458-2A60-4CE0-A4D3-7A478A6F2AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68157458-2A60-4CE0-A4D3-7A478A6F2AAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB22E511-F32B-4E87-A4FE-356B398F12F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB22E511-F32B-4E87-A4FE-356B398F12F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB22E511-F32B-4E87-A4FE-356B398F12F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB22E511-F32B-4E87-A4FE-356B398F12F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAAA1143-385F-42A7-A4F4-A139CA78ACAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAAA1143-385F-42A7-A4F4-A139CA78ACAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAAA1143-385F-42A7-A4F4-A139CA78ACAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAAA1143-385F-42A7-A4F4-A139CA78ACAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3B56FD8-843B-4D00-8C6C-3C8429386809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3B56FD8-843B-4D00-8C6C-3C8429386809}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3B56FD8-843B-4D00-8C6C-3C8429386809}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3B56FD8-843B-4D00-8C6C-3C8429386809}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E612DB0A-6D07-4E8D-9E08-5132A3A793F1}
+	EndGlobalSection
+EndGlobal

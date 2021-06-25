@@ -1,0 +1,66 @@
+﻿@page "/login"
+@using WealthManager.Client.Services.Implementations
+@using WealthManager.Shared.ViewModels
+@layout LoginLayout
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+
+<div class="centeredCard">
+    <Card Style="width:300px;">
+        <TitleTemplate>
+            <Icon Type="codepen" Theme="outline" /> Login
+        </TitleTemplate>
+        <Body>
+            <Form Model="@loginParameters"
+                  OnFinish="@OnSubmit"
+                  OnFinishFailed="OnFinishFailed"
+                  LabelColSpan="8"
+                  WrapperColSpan="16">
+                <FormItem Label="Username">
+                    <Input @bind-Value="@loginParameters.UserName" />
+                </FormItem>
+                <FormItem Label="Password">
+                    <InputPassword @bind-Value="@loginParameters.Password" />
+                </FormItem>
+                <FormItem WrapperColOffset="4" WrapperColSpan="16">
+                    <Checkbox @bind-Value="loginParameters.RememberMe">Remember me</Checkbox>
+                </FormItem>
+                <FormItem WrapperColOffset="0" WrapperColSpan="24">
+                    <Button Type="@ButtonType.Primary" HtmlType="submit">
+                        Submit
+                    </Button>
+                </FormItem>
+                <label class="text-danger">@error</label>
+            </Form>
+
+
+            <NavLink href="register">
+                <span class="font-weight-normal text-center">Create account</span>
+            </NavLink>
+        </Body>
+    </Card>
+</div>
+
+
+@code{ UserLoginVM loginParameters { get; set; } = new UserLoginVM();
+    string error { get; set; }
+
+    async Task OnSubmit()
+    {
+        error = null;
+        try
+        {
+            await authStateProvider.Login(loginParameters);
+            navigationManager.NavigateTo("");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed");
+    } }
+

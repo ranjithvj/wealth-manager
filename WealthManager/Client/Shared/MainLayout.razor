@@ -1,0 +1,142 @@
+﻿@inherits LayoutComponentBase
+@using WealthManager.Client.Services.Implementations
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+
+<AuthorizeView>
+    <Authorized>
+        <Layout Style="min-height: 100vh; ">
+            <Sider Breakpoint="@BreakpointType.Lg"
+                   CollapsedWidth="0"
+                   OnBreakpoint="broken => {
+            Console.WriteLine(broken);
+        }"
+                   OnCollapse="collapsed => {
+            Console.WriteLine(collapsed);
+        }">
+                <div class="logo">
+                    <Icon Type="codepen" Theme="outline" Class="logoIcon" />
+                    <span class="nav-text">Wealth Manager</span>
+                </div>
+                <Menu Theme="MenuTheme.Dark" Mode="MenuMode.Inline" DefaultSelectedKeys=@(new[]{"1"})>
+                    <MenuItem Key="1">
+                        <Icon Type="home" Theme="outline" />
+                        <span class="nav-text">Dashboard</span>
+                    </MenuItem>
+                    <SubMenu Key="sub1" TitleTemplate=sub1Title>
+                        <MenuItem Key="2" RouterLink="/fixeddeposit">FD</MenuItem>
+                        <MenuItem Key="3" RouterLink="/recurringdeposit">RD</MenuItem>
+                    </SubMenu>
+                    <SubMenu Key="sub2" TitleTemplate=sub2Title>
+                        <MenuItem Key="4" RouterLink="/mutualfund">Mutual Funds</MenuItem>
+                        <MenuItem Key="5">Stocks</MenuItem>
+                        <MenuItem Key="6">Foreign Stocks</MenuItem>
+                    </SubMenu>
+                    <MenuItem Key="7">
+                        <Icon Type="upload" Theme="outline" />
+                        <span class="nav-text">Expenses</span>
+                    </MenuItem>
+                    <MenuItem Key="8">
+                        <Icon Type="gold" Theme="outline" />
+                        <span class="nav-text">Gold</span>
+                    </MenuItem>
+                </Menu>
+            </Sider>
+            <Layout>
+                <Menu Mode=MenuMode.Horizontal>
+
+                    <MenuItem Key="Notification" class="float-right">
+                        <Icon Type="notification" Theme="outline"></Icon>
+                        Notifications
+                    </MenuItem>
+                    <SubMenu TitleTemplate=@userNavTitle class="float-right">
+                        <MenuItemGroup>
+                            <MenuItem Key="setting:1">
+                                <Icon Type="profile" Theme="outline"></Icon>
+                                Profile
+                            </MenuItem>
+                            <MenuItem Key="setting:2" @onclick="@LogoutClick">
+                                <Icon Type="logout" Theme="outline"></Icon>
+                                Logout
+                            </MenuItem>
+                        </MenuItemGroup>
+                    </SubMenu>
+                </Menu>
+                <Content Style=" margin: 4px 4px 0;">
+                    <div class="site-layout-background" style="padding: 12px;">
+                        @Body
+                    </div>
+                </Content>
+            </Layout>
+        </Layout>
+
+
+    </Authorized>
+    <NotAuthorized>
+
+        @*Just render the body so that RedirectToLogin works*@
+        @Body
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code{  bool collapsed;
+    void onCollapse(bool collapsed)
+    {
+        Console.WriteLine(collapsed);
+        this.collapsed = collapsed;
+    }
+    async Task LogoutClick()
+    {
+        await authStateProvider.Logout();
+        navigationManager.NavigateTo("/login");
+    }
+
+    RenderFragment userNavTitle =
+@<Template>
+    <Icon Type="user" Theme="outline"></Icon>
+    Account
+</Template>;
+
+RenderFragment sub2Title =
+@<span>
+    <Icon Type="stock" Theme="outline" />
+    <span>Equity</span>
+</span>;
+
+RenderFragment sub1Title =
+@<span>
+    <Icon Type="file-done" Theme="outline" />
+    <span>Fixed Instruments</span>
+</span>;
+
+
+}
+
+<style>
+    .logo {
+        height: 20px;
+        color: #fff;
+        margin: 12px;
+        font-size: 17px;
+    }
+
+    .logoIcon {
+        font-size: 25px;
+    }
+
+
+    .site-layout-sub-header-background {
+        background: #fff;
+        height: 50px;
+    }
+
+    .site-layout-background {
+        background: #fff;
+    }
+
+    .float-right {
+        float: right;
+    }
+</style>
