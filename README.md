@@ -18,23 +18,27 @@ Here's what this app aims to do:
 * Track FD/RD contributions
 * A unified dashboard to view one's current net worth
 
-Here's why this app is safe :
-* It uses a local SQlite DB for storing data, so you own your data
-
 Here's how it works :
 * For Mutual Fund contributions, the app expects the CAS ( Consolidated Account Statement ) to be uploaded 
 * For Stocks, the no. of units needs to be entered manually
 * For RD/FD, manual entries are needed
 * The current prices of stocks/MF's are obtained from external APIs
 
+Nice to have in future : 
+* Track monthly expense 
+
 You may also suggest changes by forking this repo and creating a pull request or opening an issue. 
 
 ### Built With
 
 * [ASP.NET Core](https://dotnet.microsoft.com/)
-* [Python](https://www.python.org/)
+* [Blazor](http://blazor.net/)
+* [ANT Blazor](https://antblazor.com/)
+* [Python Flask](https://flask.palletsprojects.com/en/2.0.x/)
+* [Express](https://expressjs.com/)
 * [SQLite](https://www.sqlite.org/index.html)
 
 ### Uses code from following repos 
 * [CAS Reader](https://github.com/codereverser/casparser)
 * [AMFI NAV Reader](https://github.com/AmruthPillai/AMFI-API)
+* [XIRR Calculator](https://github.com/klearlending/XIRR)
